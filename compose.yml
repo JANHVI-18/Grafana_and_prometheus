@@ -1,0 +1,26 @@
+version: "3"
+services:
+  prometheus:
+    image: prom/prometheus:v2.39.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - monitoring
+    restart: always
+
+  node_exporter:
+    image: prom/node-exporter:v1.3.1
+    container_name: node_exporter
+    ports:
+      - "9100:9100"
+    networks:
+      - monitoring
+    restart: always
+
+networks:
+  monitoring:
+    driver: bridge
+
