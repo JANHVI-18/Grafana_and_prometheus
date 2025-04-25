@@ -1,50 +1,52 @@
-# **Monitoring with Prometheus and Grafana**
+Here’s your enhanced version of the **Prometheus + Grafana Monitoring Guide** with emojis and improved readability! 🎯📊🖥️
 
+---
 
-## **1. Install Node Exporter on Linux/WSL/Docker**
-Node Exporter collects system metrics and exposes them for Prometheus.
+# 🚀 **Monitoring with Prometheus and Grafana**
 
-### **Steps:**
-1. **Download and extract Node Exporter**:
+## 📦 **1. Install Node Exporter on Linux/WSL/Docker**
+Node Exporter collects system metrics like CPU, memory, and disk and exposes them for Prometheus.
+
+### 🛠️ **Steps:**
+
+1. 📥 **Download and Extract Node Exporter**:
 ```bash
 wget https://github.com/prometheus/node_exporter/releases/download/v1.9.1/node_exporter-1.9.1.linux-amd64.tar.gz
 tar xvfz node_exporter-*.*-amd64.tar.gz
 cd node_exporter-*.*-amd64
 ```
-![Screenshot 2025-04-17 105728](image1.jpg)
+📸 ![Step 1](https://github.com/JANHVI-18/Grafana_and_prometheus/blob/main/images/1.png)
 
-2. **Run Node Exporter**:
+2. ▶️ **Run Node Exporter**:
 ```bash
 ./node_exporter
 ```
-- This starts Node Exporter on `http://localhost:9100`.
-![Screenshot 2025-04-17 105837](image2.jpg)
+🌐 This starts Node Exporter at: `http://localhost:9100`  
+📸 ![Step 2](https://github.com/JANHVI-18/Grafana_and_prometheus/blob/main/images/2.png)
 
+3. 🔍 **Verify Metrics**:
+Open in browser 👉 [http://localhost:9100/metrics](http://localhost:9100/metrics)  
+Or via terminal:
+```bash
+curl http://localhost:9100/metrics
+curl http://localhost:9100/metrics | grep "node_"
+```
+📸 ![Step 3](https://github.com/JANHVI-18/Grafana_and_prometheus/blob/main/images/3.png)
 
-3. **Verify Metrics**:
-- Open in browser: [http://localhost:9100/metrics](http://localhost:9100/metrics)
-- Or check via `curl`:
-    ```bash
-    curl http://localhost:9100/metrics
-    curl http://localhost:9100/metrics | grep "node_"
-    ```
-![Screenshot 2025-04-17 105854](https://github.com/user-attachments/assets/8c409c54-f435-4885-a8ea-0c029e9b24ee)
-
-
-4. **Note the WSL IP (if needed)**:
-- If Prometheus runs outside WSL (e.g., Windows host or Docker), get WSL's IP:
-    ```bash
-    hostname -I
-    ```
-- Replace `localhost` with this IP in `prometheus.yml` later.
+4. 🧠 **Note WSL IP (if required)**:
+```bash
+hostname -I
+```
+📌 If Prometheus runs outside WSL, replace `localhost` with this IP in `prometheus.yml`.
 
 ---
 
-## **2. Start Prometheus & Grafana with Docker Compose**
-Prometheus scrapes metrics, and Grafana visualizes them.
+## 🐳 **2. Start Prometheus & Grafana with Docker Compose**
+Prometheus 🔁 scrapes metrics, and Grafana 📊 visualizes them beautifully.
 
-### **Steps:**
-1. **Create `docker-compose.yml`**:
+### 🛠️ **Steps:**
+
+1. 📁 **Create `docker-compose.yml`**:
 ```yaml
 services:
   prometheus:
@@ -58,6 +60,7 @@ services:
     volumes:
       - ./prometheus:/etc/prometheus
       - prom_data:/prometheus
+
   grafana:
     image: grafana/grafana
     container_name: grafana
@@ -69,11 +72,12 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=grafana
     volumes:
       - ./grafana:/etc/grafana/provisioning/datasources
+
 volumes:
   prom_data:
 ```
 
-2. **Configure `prometheus.yml`**:
+2. 📝 **Create `prometheus.yml`**:
 ```yaml
 global:
   scrape_interval: 15s
@@ -81,151 +85,98 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
-- job_name: prometheus
-  honor_timestamps: true
-  scrape_interval: 15s
-  scrape_timeout: 10s
-  metrics_path: /metrics
-  scheme: http
-  static_configs:
-  - targets:
-    - localhost:9090
-  
-- job_name: node_exporter
-  honor_timestamps: true
-  scrape_interval: 15s
-  scrape_timeout: 10s
-  metrics_path: /metrics
-  scheme: http
-  static_configs:
-  - targets:
-    # - localhost:9100 # you migth want to change this to your host IP, if running in node exporter is running in wsl use `hostname -I` to get IP
-    - 172.27.200.56:9100 # you migth want to change this to your host IP, if running in node exporter is running in wsl use `hostname -I` to get IP
+  - job_name: prometheus
+    static_configs:
+      - targets: ['localhost:9090']
 
+  - job_name: node_exporter
+    static_configs:
+      - targets: ['172.27.200.56:9100']  # Use WSL IP from `hostname -I`
 ```
 
-3. **Start Services**:
+3. 🚀 **Start Monitoring Stack**:
 ```bash
 docker-compose up -d
 ```
-![Screenshot 2025-04-17 111039](image3.jpg)
+📸 ![Docker Compose](https://github.com/JANHVI-18/Grafana_and_prometheus/blob/main/images/4.png)
 
-
-4. **Verify Prometheus**:
+4. ✅ **Verify Prometheus**:
 - Open [http://localhost:9090](http://localhost:9090)
-- Check targets: **Status → Targets** → Ensure `node-exporter` is **UP**.
+- Navigate to: **Status → Targets**  
+Ensure `node_exporter` shows **UP** ✅
+
+📸 ![Prometheus Targets](https://github.com/JANHVI-18/Grafana_and_prometheus/blob/main/images/5.png)
+📸 ![Prometheus Status](https://github.com/JANHVI-18/Grafana_and_prometheus/blob/main/images/6.png)
 
 ---
-![Screenshot 2025-04-17 112222](image4.png)
 
-![Screenshot 2025-04-17 124853](image5.jpg)
+## 📈 **3. Set Up Grafana Dashboard**
 
+### 🛠️ **Steps:**
 
-## **3. Set Up Grafana Dashboard**
-Grafana provides visualization for collected metrics.
-
-### **Steps:**
-1. **Access Grafana**:
+1. 🔑 **Login to Grafana**:
 - Open [http://localhost:3000](http://localhost:3000)
-- Default login: `admin` / `admin`
-![Screenshot 2025-04-17 124952](image6.jpg)
-![Screenshot 2025-04-17 112330](image7.png)
+- Default credentials: `admin / admin`
+📸 ![Login](https://github.com/JANHVI-18/Grafana_and_prometheus/blob/main/images/7.png)
 
+2. 🔌 **Add Prometheus as a Data Source**:
+- Navigate: **Configuration → Data Sources → Add data source**
+- Select **Prometheus**
+- URL: `http://prometheus:9090` (or your Prometheus container IP)
 
-2. **Add Prometheus Data Source**:
-- **Configuration → Data Sources → Add Prometheus**
-- URL: `http://prometheus:9090` (or `http://<Prometheus_IP>:9090` if not in Docker)
-![Screenshot 2025-04-17 112557](image8.png)
-![Screenshot 2025-04-17 112753](https://github.com/user-attachments/assets/1b39f8b5-ab25-497e-87f7-6ff3ee538f24)
+📸 ![Data Source](https://github.com/JANHVI-18/Grafana_and_prometheus/blob/main/images/9.png)
 
+3. 📥 **Import Node Exporter Dashboard**:
+- Go to: **Create (+) → Import**
+- Dashboard ID: `1860`
+- Select the Prometheus data source → **Import**
 
-3. **Import Node Exporter Dashboard**:
-- **Create (+) → Import → Dashboard ID `1860`**  
-    (or download [Node Exporter Full Dashboard](https://grafana.com/grafana/dashboards/1860))
-- Select Prometheus data source → **Import**.
-![Screenshot 2025-04-17 112841](image.png)
+📸 ![Import Dashboard](https://github.com/JANHVI-18/Grafana_and_prometheus/blob/main/images/12.1.png)
 
+4. 📊 **View Your Dashboard**:
+You’ll now see real-time metrics on:
+- CPU 🔧
+- Memory 🧠
+- Disk 💾
+- Network 📡
 
-4. **View Metrics**:
-- The dashboard will now display CPU, memory, disk, and network metrics.
-
----
-![WhatsApp Image 2025-04-17 at 21 35 02](https://github.com/user-attachments/assets/5cab920c-1fdb-4e9e-9529-56b1662c9bc8)
-
-
-## **Troubleshooting**
-- **Connection Issues?**
-- Ensure `node_exporter` is running (`curl http://localhost:9100/metrics`).
-- Check `prometheus.yml` uses the correct IP (`hostname -I` in WSL).
-- Disable firewalls blocking port `9100` (Windows Defender/WSL).
-
-- **Prometheus Not Scraping?**
-- Restart services: `docker-compose restart`.
-- Check logs: `docker-compose logs prometheus`.
+📸 ![Dashboard](https://github.com/JANHVI-18/Grafana_and_prometheus/blob/main/images/11.png)
 
 ---
 
-## **Summary**
-**Node Exporter** installed and running (`:9100/metrics`).  
-**Prometheus** scraping metrics (`:9090/targets`).  
-**Grafana** dashboard imported (`:3000`).  
+## 🛠️ **Troubleshooting Tips**
 
-Now you have a full monitoring stack! 
-
-
-
----
-
-#RAW Instructions
-
-# 1 Install prometheus exporter on test linux system/wsl/docker container
-
-read instructions [https://prometheus.io/docs/guides/node-exporter/](https://prometheus.io/docs/guides/node-exporter/)
-
-````bash
-wget https://github.com/prometheus/node_exporter/releases/download/v1.9.1/node_exporter-1.9.1.linux-amd64.tar.gz
-tar xvfz node_exporter-*.*-amd64.tar.gz
-cd node_exporter-*.*-amd64
-./node_exporter
-
-echo "visit http://localhost:9100/metrics"
-```
-
-
-
-after this tutorial check metrics at http://localhost:9100/metrics
-
-or execute
-
+🔌 **Connection Issues?**
+- Make sure Node Exporter is running:
 ```bash
 curl http://localhost:9100/metrics
-curl http://localhost:9100/metrics | grep "node_"
+```
+- Confirm correct IP is used in `prometheus.yml`.
+
+🔥 **Firewall Block?**
+- Ensure port `9100` is not blocked by Windows Defender/WSL firewall.
+
+🔄 **Prometheus Not Scraping?**
+- Restart services:
+```bash
+docker-compose restart
+```
+- Check logs:
+```bash
+docker-compose logs prometheus
 ```
 
-It will show metrics however, you might need to use actual IP of node exporter, use `hostname -I` to get IP of WSL, and replace `- targets: <actual ip of WSL/node_exporter>` in prometheus.yml
+---
 
-# 2 Start prometheus and grafana using docker compose
-now execute `docker-compose up -d`
+## ✅ **Summary**
 
-check prometheus data collection database server
-[localhost:9090](localhost:9090)
+| Component        | Status                         |
+|------------------|-------------------------------|
+| 🖥️ Node Exporter | Running on `:9100/metrics`     |
+| 📡 Prometheus     | Scraping metrics at `:9090`    |
+| 📊 Grafana        | Visualizing data at `:3000`    |
 
-go to Prometheus >> status >> targets to view status of targets. If status is UP, you can continue with grafana.
+You're now monitoring your system like a pro! 🎉  
+Happy Observing! 👩‍💻🧑‍💻📊
 
-
-View grafana dashboard at 
-[localhost:3000](localhost:3000)
-
-follow 
-+ >> New Dashboard,
-
-you can create your own dashboard, however, it is easier to import from existing templates,
->> import dashboard >> Discard
-
-visit grafana.com/dashboards for available templates,
-but for node exporter use template at [1860-node-exporter-full/](https://grafana.com/grafana/dashboards/1860-node-exporter-full/)
-
->> download JSON, copy it and add it on previous pannel `JSON model`.
->> Load,
-
-> Observe shown metrics.
+--- 
